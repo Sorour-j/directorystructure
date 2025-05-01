@@ -4,9 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import directorystructure.domainmodel.DirectoryNode;
 import directorystructure.domainmodel.FileNode;
@@ -32,7 +35,7 @@ public class CsvParser implements Parser {
 	public List<Node> parse(InputStream input) throws Exception {
 
 		List<String[]> rawRows = new ArrayList<>(); // lines of input separated by delimiter
-		List<Node> nodeMap = new ArrayList(); // keep track of node type with id
+		List<Node> nodes = new ArrayList(); // keep track of node type with id
 
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
 			String line;
@@ -49,8 +52,15 @@ public class CsvParser implements Parser {
 		}
 
 		for (String[] properties : rawRows) {
-			String id = properties[0].trim();
-			String parentId = properties[1].trim();
+			int id;
+			int parentId;
+			try {
+					id = Integer.parseInt(properties[0].trim());
+					parentId = ( !properties[1].trim().isEmpty() ? Integer.parseInt(properties[1].trim()) : 0);
+			} catch (NumberFormatException e) {
+			    throw new IllegalArgumentException("Invalid ID or parentId", e);
+			}
+			
 			String name = properties[2].trim();
 			String type = properties[3].trim();
 			Double size = (properties.length > 4 && !properties[4].trim().isEmpty()) ? Double.parseDouble(properties[4].trim()) : null;
@@ -59,17 +69,52 @@ public class CsvParser implements Parser {
 			Double checksum = properties.length > 6 && !properties[6].trim().isEmpty() ? Double.parseDouble(properties[6].trim()) : null;
 
 			if (type.equalsIgnoreCase("file")) {
-				nodeMap.add(FileNode.create(id, parentId, name, size, classification, checksum));
+				nodes.add(FileNode.create(id, parentId, name, size, classification, checksum));
 			}
 
 			else if (type.equalsIgnoreCase("directory")) {
-				nodeMap.add(DirectoryNode.create(id, parentId, name, size));
+				nodes.add(DirectoryNode.create(id, parentId, name, size));
 			} 
 			else {
 				throw new IllegalArgumentException("Unknown type: " + type);
 			}
 		}
-		return nodeMap;
+		StructureBuilder(nodes);
+		return nodes;
 	}
 
+	// add children to directory nodes
+	private void StructureBuilder(List<Node> nodes) {
+		
+		Node root = null;
+		Map<Integer, Node> nodeMap = nodes.stream()
+	            .collect(Collectors.toMap(Node::getId, Function.identity()));
+		
+		
+		for (Node node : nodes) {
+			int parentId = node.getParentId();
+			
+			
+			if (parentId == 0) {
+				if (root != null) {
+					throw new IllegalStateException("Multiple roots is not allowed");
+				}
+				if (!(node instanceof DirectoryNode)) {
+					throw new IllegalStateException("Root must be a directory");
+				}
+				root = (DirectoryNode)node;
+			}
+			else {
+				Node parent = nodeMap.get(parentId);
+				if (!(parent instanceof DirectoryNode)) {
+					throw new IllegalStateException("Parent is not a directory");
+				}
+				((DirectoryNode)parent).addChild(node);
+			}
+		}
+		if (root == null) {
+			throw new IllegalStateException("No root is found!");
+		}
+	}
 }
+

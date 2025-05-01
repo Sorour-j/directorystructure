@@ -4,14 +4,12 @@ public abstract class Node {
 
 	private final String id;
 	private final String parentId;
-	private final Node parent;
 	private final String name;
 	private final Double size;
 
-	protected Node(String id, String parentId, Node parent, String name, Double size) {
+	protected Node(String id, String parentId, String name, Double size) {
 		this.id = id;
 		this.parentId = parentId;
-		this.parent = parent;
 		this.name = name;
 		this.size = size;
 	}
@@ -26,16 +24,12 @@ public abstract class Node {
 		return parentId;
 	}
 
-	public Node getParent() {
-		return parent;
-	}
-
 	public String getName() {
 		return name;
 	}
 
 	public Double getSize() {
-		return size;
+		return (size != null) ? size : 0.0;
 	}
 
 	public static void validaName(String name) {
@@ -55,14 +49,8 @@ public abstract class Node {
 	}
 
 	public static void validateSize(Double size) {
-		if (size < 0) {
+		if (size != null && size < 0 ) {
 			throw new IllegalArgumentException("Size of file can not be a negative number");
-		}
-	}
-	
-	public static void validateParent(Node parent) {
-		if (parent != null && ! parent.isDirectory()) {
-			throw new IllegalArgumentException("The parent must be a directory ");
 		}
 	}
 }

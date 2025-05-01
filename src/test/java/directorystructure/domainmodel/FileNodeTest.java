@@ -11,17 +11,16 @@ public class FileNodeTest {
 	
 	@BeforeEach
     void setUp() {
-		root = DirectoryNode.create("2", "",null, "folder2", 0.0);
+		root = DirectoryNode.create("2", "", "folder2", 0.0);
     }
 
 	@Test
 	public void createFileNodeSuccess() {
 		
-		FileNode file = FileNode.create("4", "2",root, "file4", 40.0, "secret", 42.0);
+		FileNode file = FileNode.create("4", "2", "file4", 40.0, "secret", 42.0);
 		
 		assertEquals("4", file.getId());
 		assertEquals("2", file.getParentId());
-		assertEquals(root, file.getParent());
 		assertEquals("file4", file.getName());
 		assertEquals(40.0, file.getSize());
 		assertEquals("secret", file.getClassification());

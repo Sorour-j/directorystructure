@@ -12,16 +12,11 @@ public class DirectoryNode extends Node{
 	}
 	
 	public static DirectoryNode create(String id, String parentId, Node parent, String name, Double size) {
-		if (id.isEmpty() || id == null) {
-	        throw new IllegalArgumentException("Id cannot be empty");
-		}
 		
-		if (name == null || name.isEmpty()) {
-	        throw new IllegalArgumentException("Directory name cannot be empty");
-		}
-		if (parent != null && ! parent.isDirectory()) {
-			throw new IllegalArgumentException("Parent of a directory must be another directory ");
-		}
+		Node.validaId(id);
+		Node.validaName(name);
+		Node.validateParent(parent);
+		Node.validateSize(size);
 		return new DirectoryNode(id, parentId, parent, name, size);
 	}
 	

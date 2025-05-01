@@ -18,7 +18,7 @@ public class ParserTest {
 
 	@Test
 	public void parseSuccess() throws Exception {
-		CSVParser parser = CSVParser.getInstance();
+		CsvParser parser = CsvParser.getInstance();
 		String csv = "1;3;file1;file;10;Secret;42;\n"
 					 + "2;;folder2;directory;;;;\n";
 

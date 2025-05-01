@@ -2,6 +2,7 @@
 *.class
 *.classpath
 *.gitattributes
+target/
 
 # Log file
 *.log

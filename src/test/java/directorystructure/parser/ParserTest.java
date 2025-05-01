@@ -19,7 +19,7 @@ public class ParserTest {
 	@Test
 	public void parseSuccess() throws Exception {
 		CsvParser parser = CsvParser.getInstance();
-		String csv = "1;3;file1;file;10;Secret;42;\n"
+		String csv = "1;2;file1;file;10;Secret;42;\n"
 					 + "2;;folder2;directory;;;;\n";
 
 		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
@@ -28,8 +28,8 @@ public class ParserTest {
 		assertEquals(2, nodes.size());
 		FileNode node = (FileNode) nodes.get(0);
 
-		assertEquals(node.getId(), "1");
-		assertEquals(node.getParentId(), "3");
+		assertEquals(node.getId(), 1);
+		assertEquals(node.getParentId(), 2);
 		assertEquals(node.getName(), "file1");
 		assertTrue(node instanceof FileNode);
 		assertEquals(node.getSize(), 10.0);
@@ -38,10 +38,25 @@ public class ParserTest {
 		
 		DirectoryNode dir = (DirectoryNode) nodes.get(1);
 
-		assertEquals(dir.getId(), "2");
-		assertEquals(dir.getParentId(), "");
+		assertEquals(dir.getId(), 2);
+		assertEquals(dir.getParentId(), 0);
 		assertEquals(dir.getName(), "folder2");
 		assertTrue(dir instanceof DirectoryNode);
 		assertEquals(dir.getSize(), 0.0);
 	}
+	
+	public void buildStructureSuccess() throws Exception {
+		CsvParser parser = CsvParser.getInstance();
+		String csv = "1;2;file1;file;10;Secret;42;\n"
+					 + "2;;folder2;directory;;;;\n";
+
+		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
+		List<Node> nodes = parser.parse(stream);
+
+		List<Node> children = ((DirectoryNode)(nodes.get(0))).getChildren();
+		assertEquals(1, children.size());
+		assertEquals("file1",children.get(0).getName());
+		assertEquals(1,children.get(0).getId());
+	}
+	
 }

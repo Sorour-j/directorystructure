@@ -7,11 +7,11 @@ public class DirectoryNode extends Node{
 
 	private List<Node> children = new ArrayList<>();
 	
-	private DirectoryNode(String id, String parentId, String name, Double size) {
+	private DirectoryNode(int id, int parentId, String name, Double size) {
 		super(id, parentId, name, size);
 	}
 	
-	public static DirectoryNode create(String id, String parentId, String name, Double size) {
+	public static DirectoryNode create(int id, int parentId, String name, Double size) {
 		
 		Node.validaId(id);
 		Node.validaName(name);
@@ -26,6 +26,10 @@ public class DirectoryNode extends Node{
 
 	public List<Node> getChildren() {
 		return children;
+	}
+	
+	public void addChild(Node child) {
+		children.add(child);
 	}
 	
 }

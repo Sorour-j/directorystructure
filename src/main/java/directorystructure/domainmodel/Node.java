@@ -2,12 +2,12 @@ package directorystructure.domainmodel;
 
 public abstract class Node {
 
-	private final String id;
-	private final String parentId;
+	private final int id;
+	private final int parentId;
 	private final String name;
 	private final Double size;
 
-	protected Node(String id, String parentId, String name, Double size) {
+	protected Node(int id, int parentId, String name, Double size) {
 		this.id = id;
 		this.parentId = parentId;
 		this.name = name;
@@ -16,11 +16,11 @@ public abstract class Node {
 
 	public abstract boolean isDirectory();
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public String getParentId() {
+	public int getParentId() {
 		return parentId;
 	}
 
@@ -42,9 +42,9 @@ public abstract class Node {
 		}
 	}
 
-	public static void validaId(String id) {
-		if (id.isEmpty() || id == null) {
-			throw new IllegalArgumentException("Id cannot be empty");
+	public static void validaId(int id) {
+		if (id<0) {
+			throw new IllegalArgumentException("Id can not be a negative number");
 		}
 	}
 

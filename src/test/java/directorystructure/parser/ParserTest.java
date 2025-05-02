@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import directorystructure.domainmodel.DirectoryNode;
+import directorystructure.domainmodel.DirectoryStructure;
 import directorystructure.domainmodel.FileNode;
 import directorystructure.domainmodel.Node;
 
@@ -52,8 +53,8 @@ public class ParserTest {
 
 		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
 		List<Node> nodes = parser.parse(stream);
-
-		List<Node> children = ((DirectoryNode)(nodes.get(0))).getChildren();
+		DirectoryStructure structure = DirectoryStructure.build(nodes);
+		List<Node> children = structure.getRoot().getChildren();
 		assertEquals(1, children.size());
 		assertEquals("file1",children.get(0).getName());
 		assertEquals(1,children.get(0).getId());

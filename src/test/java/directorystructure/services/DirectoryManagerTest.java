@@ -66,4 +66,11 @@ public class DirectoryManagerTest {
 				+ "name = file3, type = File, size = 20, classification = Top Secret, checksum = 42",result);
 	}
 	
+	@Test
+	public void getPublicFilesSizeSuccess() {
+		root.addChild(FileNode.create(6, 3, "file6", 10.0, "Public", 42.0));
+		root.addChild(FileNode.create(7, 2, "file7", 15.0, "Public", 42.0));
+		Double result = DirectoryManager.getPublicFilesSize(root);
+		assertEquals(25, result);
+	}
 }

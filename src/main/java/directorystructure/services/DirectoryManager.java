@@ -61,12 +61,12 @@ public class DirectoryManager {
 		return builder.toString().trim();
 	}
 
-	public static Double getPublicFilesSize(FileNode node) {
-		
+	public static Double getPublicFilesSize(Node node) {
+		filteredNodes = new ArrayList<FileNode>();
 		List<FileNode> result = filterByClassification(node, "Public");
-		Double sum = null;
+		Double sum = 0.0;
 		for (Node child:result) {
-			sum += node.getSize();
+			sum = sum + child.getSize();
 		}
 		return sum;
 	}

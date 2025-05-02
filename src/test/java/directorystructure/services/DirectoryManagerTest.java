@@ -16,24 +16,23 @@ public class DirectoryManagerTest {
 
 	DirectoryNode root;
 	DirectoryNode folder;
-	FileNode file;
+	FileNode file, file2;
+	List<Node> nodes = new ArrayList<>();
 	
 	@BeforeEach
     void setUp() {
 		root = DirectoryNode.create(2, 0, "folder1", 0.0);
 		folder = DirectoryNode.create(3, 2, "folder2", 0.0);
 		file = FileNode.create(4, 3, "file1", 20.0, "Secret", 42.0);
+		file2 = FileNode.create(5, 3, "file3", 20.0, "Top Secret", 42.0);
 		root.addChild(folder);
 		folder.addChild(file);
-		List<Node> nodes = new ArrayList<>();
-		nodes.add(root);
-		nodes.add(folder);
-		nodes.add(file);		
+		folder.addChild(file2);
     }
 	
 	@Test
 	public void nodeToStringTest() {
-		String expDir = "name = folder2, type = Directory, size = 20";
+		String expDir = "name = folder2, type = Directory, size = 0";
 		String expFile = "name = file1, type = File, size = 20, classification = Secret, checksum = 42";
 		
 		assertEquals(expFile, file.toString());
@@ -41,9 +40,30 @@ public class DirectoryManagerTest {
 		
 	}
 	@Test
-	public void BuildTreeSuccess() {
+	public void buildTreeSuccess() {
 		assertEquals("name = folder1, type = Directory, size = 20\n"
 				+ " name = folder2, type = Directory, size = 20\n"
-				+ "   name = file1, type = File, size = 20, classification = Secret, checksum = 42", StructureManager.BuildTree(nodes));
+				+ "  name = file1, type = File, size = 20, classification = Secret, checksum = 42\n"
+				+ "  name = file3, type = File, size = 20, classification = Top Secret, checksum = 42", DirectoryManager.printTree(root));
 	}
+	
+	@Test
+	public void filterTopSecretFilesSuccess() {
+		String result = DirectoryManager.filterTopSecretFiles(root);
+		assertEquals("name = file3, type = File, size = 20, classification = Top Secret, checksum = 42",result);
+	}
+	
+	@Test
+	public void filterSecretFilesSuccess() {
+		String result = DirectoryManager.filterSecretFiles(root);
+		assertEquals("name = file1, type = File, size = 20, classification = Secret, checksum = 42",result);
+	}
+	
+	@Test
+	public void filterTopSecretOrSecretFilesSuccess() {
+		String result = DirectoryManager.filterSecretOrTopSecretFiles(root);
+		assertEquals("name = file1, type = File, size = 20, classification = Secret, checksum = 42\n"
+				+ "name = file3, type = File, size = 20, classification = Top Secret, checksum = 42",result);
+	}
+	
 }

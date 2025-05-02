@@ -1,11 +1,13 @@
 package directorystructure.domainmodel;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class DirectoryNode extends Node{
 
 	private List<Node> children = new ArrayList<>();
+	private List<FileNode> files = new ArrayList<>();
 	
 	private DirectoryNode(int id, int parentId, String name, Double size) {
 		super(id, parentId, name, size);
@@ -37,15 +39,42 @@ public class DirectoryNode extends Node{
 			return String.format("name = %s, type = Directory, size = %.0f", this.getName(), this.getSize());
 	}
 
-	@Override
-	public Double getSize() {
-		Double size = 0.0;
-		if (getChildren().size() > 0)
-			for (Node child:getChildren()) {
-				 size =+ child.getSize();
+	private List<FileNode> findFiles(){
+		
+		for (Node child:this.getChildren()) {
+			if (child instanceof FileNode) {
+				files.add((FileNode)child);
 			}
-		setSize(size);
-		return size;
+			if (child instanceof DirectoryNode) {
+				files.addAll(((DirectoryNode)child).findFiles());
+			}
+		}
+		return files;
 	}
 	
+	public List<FileNode> getFiles(){
+		if (files.isEmpty())
+			return findFiles();
+		return files;
+	}
+	public void sortChildren() {
+		getChildren().sort(Comparator.comparing(Node::getName, String.CASE_INSENSITIVE_ORDER));// sort is case sensitive
+		for (Node node: getChildren()) {
+			if (node instanceof DirectoryNode) {
+				((DirectoryNode)node).sortChildren();
+			}
+		}
+	}
+	
+	public Double calculateSize() {
+		Double calSize = 0.0;
+		if (files.isEmpty()) {
+			getFiles();
+		}
+		for (Node node: files) {
+			calSize += node.getSize();
+		}
+		setSize(calSize);
+		return calSize;
+	}
 }

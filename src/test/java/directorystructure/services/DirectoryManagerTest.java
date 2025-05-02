@@ -40,5 +40,10 @@ public class DirectoryManagerTest {
 		assertEquals(expDir, folder.toString());
 		
 	}
-
+	@Test
+	public void BuildTreeSuccess() {
+		assertEquals("name = folder1, type = Directory, size = 20\n"
+				+ " name = folder2, type = Directory, size = 20\n"
+				+ "   name = file1, type = File, size = 20, classification = Secret, checksum = 42", StructureManager.BuildTree(nodes));
+	}
 }

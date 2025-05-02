@@ -5,7 +5,7 @@ public abstract class Node {
 	private final int id;
 	private final int parentId;
 	private final String name;
-	private final Double size;
+	protected Double size;
 
 	protected Node(int id, int parentId, String name, Double size) {
 		this.id = id;
@@ -15,7 +15,8 @@ public abstract class Node {
 	}
 
 	public abstract boolean isDirectory();
-
+	public abstract String toString();
+	
 	public int getId() {
 		return id;
 	}
@@ -30,6 +31,10 @@ public abstract class Node {
 
 	public Double getSize() {
 		return (size != null) ? size : 0.0;
+	}
+
+	public void setSize(Double size) {
+		this.size = size;
 	}
 
 	public static void validaName(String name) {

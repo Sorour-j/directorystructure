@@ -22,6 +22,7 @@ public class NodeTest {
 		assertThrows(IllegalArgumentException.class, () -> {
 			FileNode.create(-1, 2, "file4", 40.0, "secret", 42.0);
 		});
+		// The directory must have an id
 		assertThrows(IllegalArgumentException.class, () -> {
 			DirectoryNode.create(-3, 2, "folder2", 0.0);
 		});
@@ -33,7 +34,7 @@ public class NodeTest {
 		assertThrows(IllegalArgumentException.class, () -> {
 			FileNode.create(4, 3, "", 40.0, "secret", 42.0);
 		});
-
+		// The directory name can not be empty
 		assertThrows(IllegalArgumentException.class, () -> {
 			DirectoryNode.create(2, 0, "", 0.0);
 		});

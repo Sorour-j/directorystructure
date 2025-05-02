@@ -31,5 +31,21 @@ public class DirectoryNode extends Node{
 	public void addChild(Node child) {
 		children.add(child);
 	}
+
+	@Override
+	public String toString() {
+			return String.format("name = %s, type = Directory, size = %.0f", this.getName(), this.getSize());
+	}
+
+	@Override
+	public Double getSize() {
+		Double size = 0.0;
+		if (getChildren().size() > 0)
+			for (Node child:getChildren()) {
+				 size =+ child.getSize();
+			}
+		setSize(size);
+		return size;
+	}
 	
 }

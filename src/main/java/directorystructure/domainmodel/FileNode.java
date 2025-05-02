@@ -34,4 +34,9 @@ public class FileNode extends Node{
 	public Double getChecksum() {
 		return checksum;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("name = %s, type = File, size = %.0f, classification = %s, checksum = %.0f", this.getName(), this.getSize(), this.getClassification(), this.getChecksum());
+	}
 }

@@ -3,6 +3,7 @@ package directorystructure.services;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import directorystructure.domainmodel.DirectoryNode;
 import directorystructure.domainmodel.FileNode;
@@ -16,7 +17,7 @@ public class DirectoryManager {
 	public static String printTree(Node node) {
 
 		DirectoryNode root = (DirectoryNode) node;
-		root.getChildren().sort(Comparator.comparing(Node::getName));// sort is case sensitive
+		root.sortChildren();
 		tree = root.toString() + "\n";
 		treeIterator(root.getChildren(), 0);
 		return tree;
@@ -37,8 +38,8 @@ public class DirectoryManager {
 	public static String filterTopSecretFiles(Node node) {
 		filteredNodes = new ArrayList<FileNode>();
 		StringBuilder builder = new StringBuilder();
-		for (FileNode child:filterByClassification(node, "Top Secret")) {
-				builder.append(child.toString()+"\n");
+		for (FileNode child : filterByClassification(node, "Top Secret")) {
+			builder.append(child.toString() + "\n");
 		}
 		return builder.toString().trim();
 	}
@@ -46,8 +47,8 @@ public class DirectoryManager {
 	public static String filterSecretFiles(Node node) {
 		filteredNodes = new ArrayList<FileNode>();
 		StringBuilder builder = new StringBuilder();
-		for (FileNode child:filterByClassification(node, "Secret")) {
-				builder.append(child.toString()+"\n");
+		for (FileNode child : filterByClassification(node, "Secret")) {
+			builder.append(child.toString() + "\n");
 		}
 		return builder.toString().trim();
 	}
@@ -65,16 +66,37 @@ public class DirectoryManager {
 		filteredNodes = new ArrayList<FileNode>();
 		List<FileNode> result = filterByClassification(node, "Public");
 		Double sum = 0.0;
-		for (Node child:result) {
+		for (Node child : result) {
 			sum = sum + child.getSize();
 		}
 		return sum;
 	}
 
+	public static String getNonPublicFiles(Node node, String folderName) {
+		DirectoryNode folder = null;
+
+		for (Node child : ((DirectoryNode) node).getChildren())
+			if (child.getName().equals(folderName)) {
+				folder = (DirectoryNode) child;
+				break;
+			}
+		List<FileNode> result = filterByClassification(node, "Public");
+
+		List<FileNode> filtered = folder.getFiles().stream().filter(file -> !result.contains(file))
+				.collect(Collectors.toList());
+
+		sortFiles(filtered);
+		StringBuilder builder = new StringBuilder();
+		for (FileNode child : filtered) {
+			builder.append(child.toString() + "\n");
+		}
+		return builder.toString().trim();
+	}
+
 	private static List<FileNode> filterByClassification(Node node, String classification) {
 
 		if (node instanceof FileNode file && file.getClassification().equalsIgnoreCase(classification)) {
-			filteredNodes.add((FileNode)node);
+			filteredNodes.add((FileNode) node);
 		}
 		if (node instanceof DirectoryNode dir && dir.getChildren().size() > 0) {
 
@@ -82,6 +104,11 @@ public class DirectoryManager {
 				filterByClassification(child, classification);
 			}
 		}
+		sortFiles(filteredNodes);
 		return filteredNodes;
+	}
+	
+	private static void sortFiles(List<FileNode> files) {
+		files.sort(Comparator.comparing(Node::getName, String.CASE_INSENSITIVE_ORDER));// sort is case sensitive
 	}
 }

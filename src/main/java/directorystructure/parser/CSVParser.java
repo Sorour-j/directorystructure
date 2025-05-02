@@ -79,42 +79,9 @@ public class CsvParser implements Parser {
 				throw new IllegalArgumentException("Unknown type: " + type);
 			}
 		}
-		StructureBuilder(nodes);
 		return nodes;
 	}
 
-	// add children to directory nodes
-	private void StructureBuilder(List<Node> nodes) {
-		
-		Node root = null;
-		Map<Integer, Node> nodeMap = nodes.stream()
-	            .collect(Collectors.toMap(Node::getId, Function.identity()));
-		
-		
-		for (Node node : nodes) {
-			int parentId = node.getParentId();
-			
-			
-			if (parentId == 0) {
-				if (root != null) {
-					throw new IllegalStateException("Multiple roots is not allowed");
-				}
-				if (!(node instanceof DirectoryNode)) {
-					throw new IllegalStateException("Root must be a directory");
-				}
-				root = (DirectoryNode)node;
-			}
-			else {
-				Node parent = nodeMap.get(parentId);
-				if (!(parent instanceof DirectoryNode)) {
-					throw new IllegalStateException("Parent is not a directory");
-				}
-				((DirectoryNode)parent).addChild(node);
-			}
-		}
-		if (root == null) {
-			throw new IllegalStateException("No root is found!");
-		}
-	}
+
 }
 

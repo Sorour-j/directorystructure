@@ -73,4 +73,12 @@ public class DirectoryManagerTest {
 		Double result = DirectoryManager.getPublicFilesSize(root);
 		assertEquals(25, result);
 	}
+	
+	@Test
+	public void getNonPublicFilesTest() {
+		
+		String result = DirectoryManager.getNonPublicFiles(root, "folder2");
+		assertEquals("name = file1, type = File, size = 20, classification = Secret, checksum = 42\n"
+				+ "name = file3, type = File, size = 20, classification = Top Secret, checksum = 42",result);
+	}
 }

@@ -46,18 +46,4 @@ public class ParserTest {
 		assertEquals(dir.getSize(), 0.0);
 	}
 	
-	public void buildStructureSuccess() throws Exception {
-		CsvParser parser = CsvParser.getInstance();
-		String csv = "1;2;file1;file;10;Secret;42;\n"
-					 + "2;;folder2;directory;;;;\n";
-
-		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
-		List<Node> nodes = parser.parse(stream);
-		DirectoryStructure structure = DirectoryStructure.build(nodes);
-		List<Node> children = structure.getRoot().getChildren();
-		assertEquals(1, children.size());
-		assertEquals("file1",children.get(0).getName());
-		assertEquals(1,children.get(0).getId());
-	}
-	
 }

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import directorystructure.exceptions.ValidationExceptions;
+
 public class NodeTest {
 
 	DirectoryNode root;
@@ -18,32 +20,33 @@ public class NodeTest {
 
 	@Test
 	public void createWithInvalidId() {
-		// The file must have an id
-		assertThrows(IllegalArgumentException.class, () -> {
+		// The id must be a positive number
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			FileNode.create(-1, 2, "file4", 40.0, "secret", 42.0);
 		});
-		// The directory must have an id
-		assertThrows(IllegalArgumentException.class, () -> {
+		// The id must be a positive number
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			DirectoryNode.create(-3, 2, "folder2", 0.0);
 		});
 	}
 
 	@Test
 	public void createWithInvalidName() {
-		// The file name can not be empty
-		assertThrows(IllegalArgumentException.class, () -> {
+		// Name can not be empty
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			FileNode.create(4, 3, "", 40.0, "secret", 42.0);
 		});
-		// The directory name can not be empty
-		assertThrows(IllegalArgumentException.class, () -> {
+		// Name can not be empty
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			DirectoryNode.create(2, 0, "", 0.0);
 		});
 
-		// The file name must start with a letter and contains only letters and numbers
-		assertThrows(IllegalArgumentException.class, () -> {
+		// Name must start with a letter and contains only letters and numbers
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			FileNode.create(3, 2, "@file", 40.0, "secret", 42.0);
 		});
-		assertThrows(IllegalArgumentException.class, () -> {
+		// Name must start with a letter and contains only letters and numbers
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			DirectoryNode.create(2, 0, "43", 0.0);
 		});
 
@@ -52,8 +55,8 @@ public class NodeTest {
 	@Test
 	public void createWithInvalidParent() {
 
-		// The file must have a parent
-		assertThrows(IllegalArgumentException.class, () -> {
+		// A file must be in a directory
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			FileNode.create(4, 0, "", 40.0, "secret", 42.0);
 		});
 
@@ -61,12 +64,13 @@ public class NodeTest {
 
 	@Test
 	public void createWithInvalidSize() {
-		// The file name can not be empty
-		assertThrows(IllegalArgumentException.class, () -> {
+		// Size can not be a negative number
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			FileNode.create(4, 2, "file4", -50.0, "secret", 42.0);
 		});
 
-		assertThrows(IllegalArgumentException.class, () -> {
+		// Size can not be a negative number
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, () -> {
 			DirectoryNode.create(2, 0, "folder2", -6.0);
 		});
 	}

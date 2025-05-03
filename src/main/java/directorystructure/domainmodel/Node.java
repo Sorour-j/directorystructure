@@ -1,5 +1,7 @@
 package directorystructure.domainmodel;
 
+import directorystructure.exceptions.ValidationExceptions;
+
 public abstract class Node {
 
 	private final int id;
@@ -39,23 +41,23 @@ public abstract class Node {
 
 	public static void validaName(String name) {
 		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("Name of  cannot be empty");
+			throw new ValidationExceptions.InvalidNodeAttributeException("Name of  cannot be empty");
 		}
 
 		if (!name.matches("^[a-zA-Z][a-zA-Z0-9]*$")) {
-			throw new IllegalArgumentException("Name must only contain alphabetic characters and numbers.");
+			throw new ValidationExceptions.InvalidNodeAttributeException("Name must only contain alphabetic characters and numbers.");
 		}
 	}
 
 	public static void validaId(int id) {
 		if (id<0) {
-			throw new IllegalArgumentException("Id can not be a negative number");
+			throw new ValidationExceptions.InvalidNodeAttributeException("Id can not be a negative number");
 		}
 	}
 
 	public static void validateSize(Double size) {
 		if (size != null && size < 0 ) {
-			throw new IllegalArgumentException("Size of file can not be a negative number");
+			throw new ValidationExceptions.InvalidNodeAttributeException("Size of file can not be a negative number");
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package directorystructure.domainmodel;
 
+import directorystructure.exceptions.StructureExceptions;
+
 public class FileNode extends Node{
 
 	private final String classification;
@@ -18,7 +20,7 @@ public class FileNode extends Node{
 		Node.validateSize(size);
 		
 		if (parentId == 0) {
-	        throw new IllegalArgumentException("A file must be in a directory");
+	        throw new StructureExceptions.ParentNotDirectoryException("The file must be in a directory");
 		}
 		
 		return new FileNode(id, parentId, name, size, classification, checksum);

@@ -6,5 +6,5 @@ import java.util.List;
 import directorystructure.domainmodel.Node;
 
 public interface Parser {
-	  List<Node> parse(InputStream input) throws Exception;
+	List<Node> parse(InputStream input) throws Exception;
 }

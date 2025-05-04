@@ -1,3 +1,4 @@
+
 package directorystructure.domainmodel;
 
 import java.util.ArrayList;
@@ -11,6 +12,15 @@ import java.util.stream.Collectors;
 import directorystructure.exceptions.StructureExceptions;
 import directorystructure.exceptions.ValidationExceptions;
 
+/**
+ * Provides services for managing directory structures. This class offers
+ * methods for building tree representations, filtering files based on security
+ * classifications, and calculating size information.
+ * 
+ * @author Sorour
+ * @version 1.0
+ */
+
 public class DirectoryStructure {
 
 	private DirectoryNode root;
@@ -19,7 +29,18 @@ public class DirectoryStructure {
 		this.root = root;
 	}
 
-	// Build a tree structure
+	/**
+	 * Builds a directory structure from a list of nodes. This method organises the
+	 * nodes into a hierarchical structure based on their parent-child
+	 * relationships.
+	 * 
+	 * @param nodes The list of nodes to build the structure from
+	 * @return A new DirectoryStructure with the organised nodes
+	 * @throws IllegalStateException If multiple roots are found, if no root is
+	 *                               found, if the root is not a directory, or if a
+	 *                               parent is not a directory
+	 */
+
 	public static DirectoryStructure build(List<Node> nodes) {
 		Node root = null;
 		detectCycles(nodes);

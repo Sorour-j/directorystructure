@@ -1,8 +1,17 @@
-# Compiled class file
+# Java class files
 *.class
-.classpath
-.gitattributes
+
+# Maven target directory
 target/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# OS junk
+.DS_Store
+Thumbs.db
 
 # Log file
 *.log

@@ -1,7 +1,7 @@
 # Compiled class file
 *.class
-*.classpath
-*.gitattributes
+.classpath
+.gitattributes
 target/
 
 # Log file

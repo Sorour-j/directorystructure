@@ -115,6 +115,6 @@ public class DirectoryManager {
 	}
 	
 	private static void sortFiles(List<FileNode> files) {
-		files.sort(Comparator.comparing(Node::getName, String.CASE_INSENSITIVE_ORDER));// sort is case sensitive
+		files.sort(Comparator.comparing(Node::getName, String.CASE_INSENSITIVE_ORDER));// sort is case insensitive
 	}
 }

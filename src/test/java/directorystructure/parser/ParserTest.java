@@ -1,6 +1,7 @@
 package directorystructure.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -14,6 +15,7 @@ import directorystructure.domainmodel.DirectoryNode;
 import directorystructure.domainmodel.DirectoryStructure;
 import directorystructure.domainmodel.FileNode;
 import directorystructure.domainmodel.Node;
+import directorystructure.exceptions.ValidationExceptions;
 
 public class ParserTest {
 
@@ -45,5 +47,43 @@ public class ParserTest {
 		assertTrue(dir instanceof DirectoryNode);
 		assertEquals(dir.getSize(), 0.0);
 	}
+	
+	@Test
+	public void IvalidIdTest() throws Exception {
+		CsvParser parser = CsvParser.getInstance();
+		String csv = "A;2;file1;file;10;Confidential;42;\n";
+
+		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, ()->{
+				 parser.parse(stream);
+		});
+				
+	}
+	
+	@Test
+	public void IvalidTypeTest() throws Exception {
+		CsvParser parser = CsvParser.getInstance();
+		String csv = "A;2;file1;Picture;10;Confidential;42;\n";
+
+		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, ()->{
+				 parser.parse(stream);
+		});
+				
+	}
+	
+	@Test
+	public void IvalidClassificationTest() throws Exception {
+		CsvParser parser = CsvParser.getInstance();
+		String csv = "1;2;file1;file;10;Confidential;42;\n";
+
+		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
+		assertThrows(ValidationExceptions.InvalidNodeAttributeException.class, ()->{
+				 parser.parse(stream);
+		});
+				
+	}
+	
+	
 	
 }

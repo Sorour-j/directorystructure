@@ -37,6 +37,8 @@ public abstract class Node {
 
 	public abstract String toString();
 
+	public abstract Double getSize();
+
 	public int getId() {
 		return id;
 	}
@@ -49,17 +51,13 @@ public abstract class Node {
 		return name;
 	}
 
-	public Double getSize() {
-		return (size != null) ? size : 0.0;
-	}
-
 	public void setSize(Double size) {
 		this.size = size;
 	}
 
-	public static void validaName(String name) {
+	public static void validateName(String name) {
 		if (name == null || name.isEmpty()) {
-			throw new ValidationExceptions.InvalidNodeAttributeException("Name of  cannot be empty");
+			throw new ValidationExceptions.InvalidNodeAttributeException("Name cannot be empty");
 		}
 
 		if (!name.matches("^[a-zA-Z][a-zA-Z0-9]*$")) {
@@ -68,7 +66,7 @@ public abstract class Node {
 		}
 	}
 
-	public static void validaId(int id) {
+	public static void validateId(int id) {
 		if (id < 0) {
 			throw new ValidationExceptions.InvalidNodeAttributeException("Id can not be a negative number");
 		}

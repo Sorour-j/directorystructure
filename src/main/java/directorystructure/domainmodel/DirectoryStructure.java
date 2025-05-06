@@ -42,15 +42,19 @@ public class DirectoryStructure {
 	 */
 
 	public static DirectoryStructure build(List<Node> nodes) {
-		Node root = null;
-		detectCycles(nodes);
-		Map<Integer, Node> nodeMap;
 
+		// Check for cycles first
+		detectCycles(nodes);
+
+		// Create a map of nodes by ID
+		Map<Integer, Node> nodeMap;
 		try {
 			nodeMap = nodes.stream().collect(Collectors.toMap(Node::getId, Function.identity()));
 		} catch (IllegalStateException e) {
 			throw new IllegalStateException("Duplicate Node IDs found in the input data");
 		}
+
+		DirectoryNode root = null;
 
 		for (Node node : nodes) {
 			int parentId = node.getParentId();
@@ -60,6 +64,9 @@ public class DirectoryStructure {
 					throw new StructureExceptions.MultipleRootsException("Multiple roots is not allowed");
 				}
 
+				if (!(node instanceof DirectoryNode)) {
+					throw new StructureExceptions.ParentNotDirectoryException("Root must be a directory");
+				}
 				root = (DirectoryNode) node;
 			} else {
 				Node parent = nodeMap.get(parentId);
@@ -70,6 +77,7 @@ public class DirectoryStructure {
 				if (!(parent instanceof DirectoryNode)) {
 					throw new StructureExceptions.ParentNotDirectoryException("Parent is not a directory");
 				}
+
 				((DirectoryNode) parent).addChild(node);
 			}
 		}
@@ -77,12 +85,9 @@ public class DirectoryStructure {
 			throw new IllegalStateException("No root is found!");
 		}
 
-		for (Node child : nodes) {
-			if (child instanceof DirectoryNode) {
-				((DirectoryNode) child).calculateSize();
-			}
-		}
-		return new DirectoryStructure((DirectoryNode) root);
+		root.calculateSize();
+
+		return new DirectoryStructure(root);
 	}
 
 	public DirectoryNode getRoot() {
@@ -90,15 +95,15 @@ public class DirectoryStructure {
 	}
 
 	public static void detectCycles(List<Node> nodes) {
-		// Build child → parent map
+		// Build child-parent map
 		Map<Integer, Integer> childParent = nodes.stream().collect(Collectors.toMap(Node::getId, Node::getParentId));
 
 		for (Node node : nodes) {
-			Set<Integer> seen = new HashSet<>();
+			Set<Integer> visited = new HashSet<>();
 			Integer current = node.getId();
 
 			while (current != null) {
-				if (!seen.add(current)) {
+				if (!visited.add(current)) {
 					throw new StructureExceptions.CycleDetectedException(
 							"Cycle detected involving node ID: " + node.getId());
 				}

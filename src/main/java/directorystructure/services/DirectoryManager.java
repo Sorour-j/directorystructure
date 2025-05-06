@@ -36,6 +36,7 @@ public class DirectoryManager {
 	public static String buildTree(DirectoryStructure structure) {
 
 		DirectoryNode root = structure.getRoot();
+		root.calculateSize();
 		root.sortChildren();
 		tree = root.toString() + "\n";
 		treeIterator(root.getChildren(), 0);
@@ -73,7 +74,7 @@ public class DirectoryManager {
 		filteredNodes = new ArrayList<FileNode>();
 		StringBuilder builder = new StringBuilder();
 
-		for (FileNode child : filterByClassification(root, "Top Secret")) {
+		for (FileNode child : filterByClassification(root, "Top secret")) {
 			builder.append(child.toString() + "\n");
 		}
 		return builder.toString().trim();
@@ -122,11 +123,9 @@ public class DirectoryManager {
 		DirectoryNode root = structure.getRoot();
 		filteredNodes = new ArrayList<FileNode>();
 		List<FileNode> result = filterByClassification(root, "Public");
-		Double sum = 0.0;
-		for (Node child : result) {
-			sum = sum + child.getSize();
-		}
-		return sum;
+
+		return result.stream().mapToDouble(Node::getSize).sum();
+
 	}
 
 	/**
@@ -137,13 +136,14 @@ public class DirectoryManager {
 	 * @return A string containing all non-public files in the specified folder
 	 */
 	public static String getNonPublicFiles(DirectoryStructure structure, String folderName) {
-		DirectoryNode folder = null;
 		DirectoryNode root = structure.getRoot();
 
+		// Find the folder
+		DirectoryNode folder = null;
 		for (DirectoryNode child : root.getFolders()) {
 			if (child.getName().equals(folderName)) {
-					folder = child;
-					break;
+				folder = child;
+				break;
 			}
 		}
 
@@ -151,14 +151,16 @@ public class DirectoryManager {
 			throw new ValidationExceptions.NoSuchFolderException(folderName + " does not exist");
 		}
 
-		List<FileNode> result = filterByClassification(root, "Public");
+		// Get all files in the target folder
+		List<FileNode> folderFiles = folder.getFiles();
 
-		List<FileNode> filtered = folder.getFiles().stream().filter(file -> !result.contains(file))
+		// Filter non-public files
+		List<FileNode> nonPublicFiles = folderFiles.stream().filter(file -> !"Public".equals(file.getClassification()))
+				.sorted(Comparator.comparing(Node::getName, String.CASE_INSENSITIVE_ORDER))
 				.collect(Collectors.toList());
 
-		sortFiles(filtered);
 		StringBuilder builder = new StringBuilder();
-		for (FileNode child : filtered) {
+		for (FileNode child : nonPublicFiles) {
 			builder.append(child.toString() + "\n");
 		}
 		return builder.toString().trim();
@@ -172,22 +174,13 @@ public class DirectoryManager {
 	 * @return A list of file nodes matching the specified classification
 	 */
 
-	private static List<FileNode> filterByClassification(Node node, String classification) {
+	private static List<FileNode> filterByClassification(DirectoryNode root, String classification) {
 
-		if (node instanceof FileNode file && file.getClassification().equalsIgnoreCase(classification)) {
-			filteredNodes.add((FileNode) node);
-		}
-		if (node instanceof DirectoryNode dir && dir.getChildren().size() > 0) {
+		List<FileNode> filteredNodes = root.getFiles().stream()
+				.filter(file -> classification.equals(file.getClassification()))
+				.sorted(Comparator.comparing(Node::getName, String.CASE_INSENSITIVE_ORDER))
+				.collect(Collectors.toList());
 
-			for (Node child : ((DirectoryNode) node).getChildren()) {
-				filterByClassification(child, classification);
-			}
-		}
-		sortFiles(filteredNodes);
 		return filteredNodes;
-	}
-
-	private static void sortFiles(List<FileNode> files) {
-		files.sort(Comparator.comparing(Node::getName, String.CASE_INSENSITIVE_ORDER));// sort is case insensitive
 	}
 }

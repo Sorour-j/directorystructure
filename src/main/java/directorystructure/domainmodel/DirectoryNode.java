@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import directorystructure.exceptions.ValidationExceptions;
+
 /**
  * Represents a directory node in a directory structure. A directory can contain
  * other directories and files as children.
@@ -15,8 +17,8 @@ import java.util.List;
 public class DirectoryNode extends Node {
 
 	private List<Node> children = new ArrayList<>();
-	private List<FileNode> files = new ArrayList<>();
-	private List<DirectoryNode> folders = new ArrayList<>();
+	private List<FileNode> files;
+	private List<DirectoryNode> folders;
 
 	/**
 	 * Constructs a new DirectoryNode with the specified properties.
@@ -44,8 +46,8 @@ public class DirectoryNode extends Node {
 
 	public static DirectoryNode create(int id, int parentId, String name, Double size) {
 
-		Node.validaId(id);
-		Node.validaName(name);
+		Node.validateId(id);
+		Node.validateName(name);
 		Node.validateSize(size);
 		return new DirectoryNode(id, parentId, name, size);
 	}
@@ -60,6 +62,9 @@ public class DirectoryNode extends Node {
 	}
 
 	public void addChild(Node child) {
+		if (child == null) {
+			throw new ValidationExceptions.InvalidNodeAttributeException("Child node cannot be null");
+		}
 		children.add(child);
 	}
 
@@ -68,7 +73,15 @@ public class DirectoryNode extends Node {
 		return String.format("name = %s, type = Directory, size = %.0f", this.getName(), this.getSize());
 	}
 
+	/**
+	 * Finds all file nodes in this directory and its subdirectories.
+	 * 
+	 * @return A list of all file nodes
+	 */
+
 	private List<FileNode> findFiles() {
+
+		files = new ArrayList<>(); // Reset files list to avoid duplicates
 
 		for (Node child : this.getChildren()) {
 			if (child instanceof FileNode) {
@@ -80,8 +93,16 @@ public class DirectoryNode extends Node {
 		}
 		return files;
 	}
-	
+
+	/**
+	 * Finds all directory nodes in this directory and its subdirectories.
+	 * 
+	 * @return A list of all directory nodes
+	 */
+
 	private List<DirectoryNode> findFolders() {
+
+		folders = new ArrayList<>(); // Reset folders list to avoid duplicates
 
 		for (Node child : this.getChildren()) {
 			if (child instanceof DirectoryNode) {
@@ -92,7 +113,6 @@ public class DirectoryNode extends Node {
 		return folders;
 	}
 
-
 	/**
 	 * Gets all file nodes that are children of this directory.
 	 * 
@@ -100,15 +120,11 @@ public class DirectoryNode extends Node {
 	 */
 
 	public List<FileNode> getFiles() {
-		if (files.isEmpty())
-			return findFiles();
-		return files;
+		return findFiles();
 	}
-	
+
 	public List<DirectoryNode> getFolders() {
-		if (folders.isEmpty())
-			return findFolders();
-		return folders;
+		return findFolders();
 	}
 
 	public void sortChildren() {
@@ -127,14 +143,25 @@ public class DirectoryNode extends Node {
 	 * @return The total size of the directory
 	 */
 	public Double calculateSize() {
-		Double calSize = 0.0;
-		if (files.isEmpty()) {
-			getFiles();
+
+		Double totalSize = 0.0;
+
+		// Sum sizes of direct children
+		for (Node child : getChildren()) {
+			if (child instanceof FileNode) {
+				totalSize += child.getSize();
+			} else if (child instanceof DirectoryNode dirNode) {
+				// Recursive calculation for directories
+				totalSize += dirNode.calculateSize();
+			}
 		}
-		for (Node node : files) {
-			calSize += node.getSize();
-		}
-		setSize(calSize);
-		return calSize;
+
+		setSize(totalSize);
+		return totalSize;
+	}
+
+	@Override
+	public Double getSize() {
+		return calculateSize();
 	}
 }

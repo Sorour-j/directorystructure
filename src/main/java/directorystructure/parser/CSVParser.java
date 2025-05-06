@@ -54,7 +54,7 @@ public class CsvParser implements Parser {
 	public List<Node> parse(InputStream input) throws Exception {
 
 		List<String[]> rawRows = new ArrayList<>(); // lines of input separated by delimiter
-		List<Node> nodes = new ArrayList(); // keep track of node type with id
+		List<Node> nodes = new ArrayList<>(); // keep track of node type with id
 		Set<String> validClassifications = Set.of("Public", "Secret", "Top secret");
 
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {

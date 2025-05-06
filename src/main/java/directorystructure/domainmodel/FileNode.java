@@ -49,8 +49,8 @@ public class FileNode extends Node {
 	public static FileNode create(int id, int parentId, String name, Double size, String classification,
 			Double checksum) {
 
-		Node.validaName(name);
-		Node.validaId(id);
+		Node.validateName(name);
+		Node.validateId(id);
 		Node.validateSize(size);
 
 		if (parentId == 0) {
@@ -77,5 +77,10 @@ public class FileNode extends Node {
 	public String toString() {
 		return String.format("name = %s, type = File, size = %.0f, classification = %s, checksum = %.0f",
 				this.getName(), this.getSize(), this.getClassification(), this.getChecksum());
+	}
+
+	@Override
+	public Double getSize() {
+		return (this.size != null) ? this.size : 0.0;
 	}
 }

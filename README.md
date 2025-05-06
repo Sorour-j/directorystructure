@@ -56,7 +56,7 @@ String topSecretFiles = DirectoryManager.filterTopSecretFiles(structure);
 // Get all Secret or Top Secret files
 String classifiedFiles = DirectoryManager.filterSecretOrTopSecretFiles(structure);
 Working with Public Files
-java// Get total size of public files
+// Get total size of public files
 Double publicFilesSize = DirectoryManager.getPublicFilesSize(structure);
 
 // Get non-public files in a specific folder

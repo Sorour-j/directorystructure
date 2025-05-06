@@ -3,6 +3,9 @@ package directorystructure.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,51 +18,56 @@ import directorystructure.domainmodel.FileNode;
 import directorystructure.domainmodel.Node;
 import directorystructure.exceptions.StructureExceptions;
 import directorystructure.exceptions.ValidationExceptions;
+import directorystructure.parser.CsvParser;
 
 public class DirectoryManagerTest {
 
 	DirectoryNode root;
 	DirectoryNode folder;
-	FileNode file, file2;
-	List<Node> nodes = new ArrayList<>();
+	
 	DirectoryStructure structure = null;
-
+	
 	@BeforeEach
-	void setUp() {
-		root = DirectoryNode.create(2, 0, "folder1", 0.0);
-		folder = DirectoryNode.create(3, 2, "folder2", 0.0);
-		file = FileNode.create(4, 3, "file1", 20.0, "Secret", 42.0);
-		file2 = FileNode.create(5, 3, "file3", 20.0, "Top Secret", 42.0);
-		nodes.add(root);
-		nodes.add(folder);
-		nodes.add(file);
-		nodes.add(file2);
+	void setUp() throws Exception {
+		CsvParser parser = CsvParser.getInstance();
+		String csv = "1;;folder1;directory;;;;\n" + 
+					 "2;1;folder2;directory;;;;\n" +
+					 "3;2;file1;file;20;Secret;42;\n" +
+					 "4;2;file3;file;20;Top secret;42;\n" +
+					 "5;2;file6;file;10;Public;42;\n" +
+					 "6;2;file7;file;15;Public;42;\n";
+
+		InputStream stream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8));
+		List<Node> nodes = parser.parse(stream);
 		structure = DirectoryStructure.build(nodes);
+		root = structure.getRoot();
 	}
 
 	@Test
 	public void nodeToStringTest() {
-		String expDir = "name = folder2, type = Directory, size = 40";
+		String expDir = "name = folder1, type = Directory, size = 65";
 		String expFile = "name = file1, type = File, size = 20, classification = Secret, checksum = 42";
 
-		assertEquals(expFile, file.toString());
-		assertEquals(expDir, folder.toString());
-
+		assertEquals(expFile, root.getFiles().get(0).toString());
+		assertEquals(expDir, root.toString());
 	}
 
 	@Test
 	public void buildTreeSuccess() {
 		assertEquals(
-				"name = folder1, type = Directory, size = 40\n" + " name = folder2, type = Directory, size = 40\n"
-						+ "  name = file1, type = File, size = 20, classification = Secret, checksum = 42\n"
-						+ "  name = file3, type = File, size = 20, classification = Top Secret, checksum = 42",
+				"name = folder1, type = Directory, size = 65\n" + 
+				" name = folder2, type = Directory, size = 65\n"+ 
+				"  name = file1, type = File, size = 20, classification = Secret, checksum = 42\n" + 
+				"  name = file3, type = File, size = 20, classification = Top secret, checksum = 42\n" +
+				"  name = file6, type = File, size = 10, classification = Public, checksum = 42\n" +
+				"  name = file7, type = File, size = 15, classification = Public, checksum = 42",
 				DirectoryManager.buildTree(structure));
 	}
 
 	@Test
 	public void filterTopSecretFilesSuccess() {
 		String result = DirectoryManager.filterTopSecretFiles(structure);
-		assertEquals("name = file3, type = File, size = 20, classification = Top Secret, checksum = 42", result);
+		assertEquals("name = file3, type = File, size = 20, classification = Top secret, checksum = 42", result);
 	}
 
 	@Test
@@ -72,13 +80,12 @@ public class DirectoryManagerTest {
 	public void filterTopSecretOrSecretFilesSuccess() {
 		String result = DirectoryManager.filterSecretOrTopSecretFiles(structure);
 		assertEquals("name = file1, type = File, size = 20, classification = Secret, checksum = 42\n"
-				+ "name = file3, type = File, size = 20, classification = Top Secret, checksum = 42", result);
+				+ "name = file3, type = File, size = 20, classification = Top secret, checksum = 42", result);
 	}
 
 	@Test
 	public void getPublicFilesSizeSuccess() {
-		root.addChild(FileNode.create(6, 3, "file6", 10.0, "Public", 42.0));
-		root.addChild(FileNode.create(7, 2, "file7", 15.0, "Public", 42.0));
+		
 		Double result = DirectoryManager.getPublicFilesSize(structure);
 		assertEquals(25, result);
 	}
@@ -88,7 +95,7 @@ public class DirectoryManagerTest {
 
 		String result = DirectoryManager.getNonPublicFiles(structure, "folder2");
 		assertEquals("name = file1, type = File, size = 20, classification = Secret, checksum = 42\n"
-				+ "name = file3, type = File, size = 20, classification = Top Secret, checksum = 42", result);
+				+ "name = file3, type = File, size = 20, classification = Top secret, checksum = 42", result);
 	}
 
 	@Test

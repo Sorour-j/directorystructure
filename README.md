@@ -6,7 +6,7 @@ This project implements a parser and query utilities for a directory structure r
 This project provides a robust way to model file systems as tree structures in Java. It includes features for:
 
 * Parsing the CSV files and build a directory structures
-* Building, validating and sisplaying tree structures
+* Building, validating and displaying tree structures
 * Working with classified files (Secret, Top Secret, Public)
 * Calculating directory sizes
 * Filtering files by classification
